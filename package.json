@@ -1,0 +1,35 @@
+{
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "husky": "^9.1.7",
+    "prettier": "^3.8.1",
+    "typescript": "^5.9.3",
+    "vite": "^8.0.0"
+  },
+  "dependencies": {
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  },
+  "scripts": {
+    "dev": "vite",
+    "test": "tsc --noEmit && prettier --check .",
+    "prepare": "husky"
+  },
+  "name": "kws2100-oving-uke10",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tangolao/kws2100-oving-uke10.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tangolao/kws2100-oving-uke10/issues"
+  },
+  "homepage": "https://github.com/tangolao/kws2100-oving-uke10#readme",
+  "type": "module"
+}
