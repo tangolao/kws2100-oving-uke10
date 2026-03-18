@@ -19,7 +19,7 @@ app.get("/api/grunnskoler", async (c) => {
   );
   return c.json({
     type: "FeatureCollection",
-    crs: { type: "name", properties: { name: "ESPG:4326" } },
+    crs: { type: "name", properties: { name: "EPSG:4326" } },
     features: result.rows.map(
       ({ geometry: { coordinates, type }, ...properties }) => ({
         type: "Feature",
