@@ -4,11 +4,14 @@ import { serveStatic } from "@hono/node-server/serve-static";
 import pg from "pg";
 
 const postgresql = new pg.Pool({
-  user: "postgres",
-  host: "localhost",
-  database: "postgres",
-  port: 5432,
-  password: "postgres",
+  // user: "postgres",
+  // host: "localhost",
+  // database: "postgres",
+  // port: 5432,
+  // password: "postgres",
+  connectionString:
+    process.env.DATABASE_URL ||
+    "postgresql://postgres:postgres@localhost/postgres",
 });
 
 const app = new Hono();
