@@ -10,16 +10,17 @@ export function createNearestSchoolLayer(data: any) {
   return new VectorLayer({
     source: new VectorSource({
       features: new GeoJSON().readFeatures(data, {
-        featureProjection: "EPSG:3857",
+        dataProjection: "EPSG:4326",
+        featureProjection: "EPSG:4326",
       }),
     }),
     style: new Style({
       image: new CircleStyle({
-        radius: 7,
+        radius: 12,
         fill: new Fill({ color: "red" }),
-        stroke: new Stroke({ color: "white", width: 2 }),
+        stroke: new Stroke({ color: "white", width: 3 }),
       }),
     }),
-    zIndex: 20,
+    zIndex: 999,
   });
 }

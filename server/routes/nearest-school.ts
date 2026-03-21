@@ -3,24 +3,28 @@ import pg from "pg";
 
 export function registerNearestSchoolRoute(app: Hono, postgresql: pg.Pool) {
   app.get("/api/nearest-school", async (c) => {
-    const result = await postgresql.query(`
+    const lon = Number(c.req.query("lon"));
+    const lat = Number(c.req.query("lat"));
+
+    if (Number.isNaN(lon) || Number.isNaN(lat)) {
+      return c.json({ error: "Missing or invalid lon/lat" }, 400);
+    }
+
+    const result = await postgresql.query(
+      `
       select
-        m.adresseid,
-        m.adressetekst,
         s.skolenavn,
-        st_distance(m.representasjonspunkt, s.posisjon) as avstand,
-        st_asgeojson(st_transform(m.representasjonspunkt, 4326))::json as geometry
-      from matrikkelenadresse_cc504ff63b9645a9afb67997f5525d90.matrikkeladresse m
-             cross join lateral (
-        select
-          skolenavn,
-          posisjon
-        from grunnskoler_e39212a4d48d4cf284c6f63f254a3d42.grunnskole
-        order by m.representasjonspunkt <-> posisjon
-          limit 1
-      ) s
-      order by m.adresseid
-    `);
+        st_distance(
+          s.posisjon,
+          st_transform(st_setsrid(st_makepoint($1, $2), 4326), 25833)
+        ) as avstand,
+        st_asgeojson(st_transform(s.posisjon, 4326))::json as geometry
+      from grunnskoler_e39212a4d48d4cf284c6f63f254a3d42.grunnskole s
+      order by s.posisjon <-> st_transform(st_setsrid(st_makepoint($1, $2), 4326), 25833)
+      limit 1
+      `,
+      [lon, lat],
+    );
 
     return c.json({
       type: "FeatureCollection",
