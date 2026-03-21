@@ -12,16 +12,16 @@ export function registerNearestSchoolRoute(app: Hono, postgresql: pg.Pool) {
 
     const result = await postgresql.query(
       `
-      select
-        s.skolenavn,
-        st_distance(
-          s.posisjon,
-          st_transform(st_setsrid(st_makepoint($1, $2), 4326), 25833)
-        ) as avstand,
-        st_asgeojson(st_transform(s.posisjon, 4326))::json as geometry
-      from grunnskoler_e39212a4d48d4cf284c6f63f254a3d42.grunnskole s
-      order by s.posisjon <-> st_transform(st_setsrid(st_makepoint($1, $2), 4326), 25833)
-      limit 1
+        select
+          s.skolenavn,
+          st_distance(
+            s.posisjon,
+            st_transform(st_setsrid(st_makepoint($1, $2), 4326), 25833)
+          ) as avstand,
+          st_asgeojson(st_transform(s.posisjon, 4326))::json as geometry
+        from grunnskoler_e39212a4d48d4cf284c6f63f254a3d42.grunnskole s
+        order by s.posisjon <-> st_transform(st_setsrid(st_makepoint($1, $2), 4326), 25833)
+          limit 1
       `,
       [lon, lat],
     );

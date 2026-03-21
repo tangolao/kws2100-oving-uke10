@@ -5,20 +5,22 @@ import { useGeographic } from "ol/proj";
 import Map from "ol/Map";
 import View from "ol/View";
 import VectorLayer from "ol/layer/Vector";
+import Overlay from "ol/Overlay";
 
 import { createGrunnskolerLayer } from "../../layers/grunnskoler-layer";
 import { fetchGrunnskoler } from "../../api/grunnskoler";
 
-import { fetchNearestSchool } from "../../api/nearest-school";
-import { createNearestSchoolLayer } from "../../layers/nearest-school-layer";
-
 import { fetchAddressesNearSchools } from "../../api/addresses-near-schools";
 import { createAddressesNearSchoolsLayer } from "../../layers/addresses-near-schools";
+
+import { fetchNearestSchool } from "../../api/nearest-school";
+import { createNearestSchoolLayer } from "../../layers/nearest-school-layer";
 
 useGeographic();
 
 export function MapView() {
   const mapRef = useRef<HTMLDivElement | null>(null);
+  const popupRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const map = new Map({
@@ -32,6 +34,15 @@ export function MapView() {
 
     let nearestLayer: VectorLayer | null = null;
 
+    const popup = new Overlay({
+      element: popupRef.current!,
+      positioning: "bottom-center",
+      stopEvent: false,
+      offset: [0, -15],
+    });
+
+    map.addOverlay(popup);
+
     // Last inn alle grunnskoler ved oppstart
     async function loadGroundskeeper() {
       try {
@@ -42,42 +53,74 @@ export function MapView() {
         console.error(error);
       }
     }
+
+    // Last inn adresser nær skoler ved oppstart
     async function loadAddressesNearSchools() {
       try {
         const data = await fetchAddressesNearSchools();
-        const layer = createAddressesNearSchoolsLayer(data);
-        map.addLayer(layer);
+        const addressesLayer = createAddressesNearSchoolsLayer(data);
+        map.addLayer(addressesLayer);
       } catch (error) {
         console.error(error);
       }
     }
-    void loadAddressesNearSchools();
+
     // Når brukeren klikker på kartet, finn nærmeste skole
     map.on("click", async (event) => {
       try {
         const [lon, lat] = event.coordinate as [number, number];
-        console.log("clicked:", lon, lat);
-
         const data = await fetchNearestSchool(lon, lat);
+
         if (nearestLayer) {
           map.removeLayer(nearestLayer);
         }
-        console.log("nearest data:", data);
 
-        // Opprett og legg til nytt layer for nærmeste skole
         nearestLayer = createNearestSchoolLayer(data);
         map.addLayer(nearestLayer);
+
+        const feature = data.features?.[0];
+        if (feature && popupRef.current) {
+          const [popupLon, popupLat] = feature.geometry.coordinates;
+          const skolenavn = feature.properties.skolenavn;
+          const avstand = Math.round(feature.properties.avstand);
+
+          popupRef.current.innerHTML = `
+            <div>
+              <strong>${skolenavn}</strong><br />
+              Avstand: ${avstand} meter
+            </div>
+          `;
+
+          popup.setPosition([popupLon, popupLat]);
+        }
       } catch (error) {
         console.error(error);
       }
     });
 
     void loadGroundskeeper();
+    void loadAddressesNearSchools();
 
     return () => {
       map.setTarget(undefined);
     };
   }, []);
 
-  return <div ref={mapRef} style={{ width: "100vw", height: "100vh" }} />;
+  return (
+    <>
+      <div ref={mapRef} style={{ width: "100vw", height: "100vh" }} />
+      <div
+        ref={popupRef}
+        style={{
+          position: "absolute",
+          backgroundColor: "white",
+          padding: "8px 12px",
+          borderRadius: "8px",
+          border: "1px solid #ccc",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+          minWidth: "160px",
+        }}
+      />
+    </>
+  );
 }
