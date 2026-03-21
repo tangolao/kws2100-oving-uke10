@@ -90,8 +90,10 @@ export function MapView() {
               Avstand: ${avstand} meter
             </div>
           `;
-
+          popupRef.current.style.display = "block";
           popup.setPosition([popupLon, popupLat]);
+        } else if (popupRef.current) {
+          popupRef.current.style.display = "none";
         }
       } catch (error) {
         console.error(error);
@@ -119,6 +121,7 @@ export function MapView() {
           border: "1px solid #ccc",
           boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
           minWidth: "160px",
+          display: "none",
         }}
       />
     </>
