@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import pg from "pg";
+import "dotenv/config";
 
 import { registerGrunnskolerRoute } from "./routes/grunnskoler";
 import { registerAddressesNearSchoolsRoute } from "./routes/addresses-near-schools";
@@ -11,6 +12,7 @@ const postgresql = new pg.Pool({
   connectionString:
     process.env.DATABASE_URL ||
     "postgresql://postgres:postgres@localhost/postgres",
+  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false,
 });
 
 const app = new Hono();

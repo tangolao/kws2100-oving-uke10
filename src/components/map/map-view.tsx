@@ -6,6 +6,10 @@ import { createGrunnskolerLayer } from "../../layers/grunnskoler-layer";
 import { fetchGrunnskoler } from "../../api/grunnskoler";
 import Map from "ol/Map";
 import View from "ol/View";
+import { fetchAddressesNearSchools } from "../../api/addresses-near-schools";
+import { createAddressesNearSchoolsLayer } from "../../layers/addresses-near-schools";
+import { fetchNearestSchool } from "../../api/nearest-school";
+import { createNearestSchoolLayer } from "../../layers/nearest-school-layer";
 
 useGeographic();
 export function MapView() {
@@ -29,7 +33,27 @@ export function MapView() {
         console.error(error);
       }
     }
+    async function loadAddressesNearSchools() {
+      try {
+        const data = await fetchAddressesNearSchools();
+        const addressesLayer = createAddressesNearSchoolsLayer(data);
+        map.addLayer(addressesLayer);
+      } catch (error) {
+        console.error(error);
+      }
+    }
 
+    async function loadNearestSchool() {
+      try {
+        const data = await fetchNearestSchool();
+        const nearestLayer = createNearestSchoolLayer(data);
+        map.addLayer(nearestLayer);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    void loadNearestSchool();
+    void loadAddressesNearSchools();
     void loadGroundskeeper();
 
     return () => {

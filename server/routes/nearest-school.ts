@@ -11,13 +11,13 @@ export function registerNearestSchoolRoute(app: Hono, postgresql: pg.Pool) {
         st_distance(m.representasjonspunkt, s.posisjon) as avstand,
         st_asgeojson(st_transform(m.representasjonspunkt, 4326))::json as geometry
       from matrikkelenadresse_cc504ff63b9645a9afb67997f5525d90.matrikkeladresse m
-      cross join lateral (
+             cross join lateral (
         select
           skolenavn,
           posisjon
         from grunnskoler_e39212a4d48d4cf284c6f63f254a3d42.grunnskole
         order by m.representasjonspunkt <-> posisjon
-        limit 1
+          limit 1
       ) s
       order by m.adresseid
     `);
