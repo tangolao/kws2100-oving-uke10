@@ -12,6 +12,9 @@ import { fetchGrunnskoler } from "../../api/grunnskoler";
 import { fetchNearestSchool } from "../../api/nearest-school";
 import { createNearestSchoolLayer } from "../../layers/nearest-school-layer";
 
+import { fetchAddressesNearSchools } from "../../api/addresses-near-schools";
+import { createAddressesNearSchoolsLayer } from "../../layers/addresses-near-schools";
+
 useGeographic();
 
 export function MapView() {
@@ -39,7 +42,16 @@ export function MapView() {
         console.error(error);
       }
     }
-
+    async function loadAddressesNearSchools() {
+      try {
+        const data = await fetchAddressesNearSchools();
+        const layer = createAddressesNearSchoolsLayer(data);
+        map.addLayer(layer);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    void loadAddressesNearSchools();
     // Når brukeren klikker på kartet, finn nærmeste skole
     map.on("click", async (event) => {
       try {

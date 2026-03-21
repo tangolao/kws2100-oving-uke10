@@ -16,11 +16,11 @@ export function createNearestSchoolLayer(data: any) {
     }),
     style: new Style({
       image: new CircleStyle({
-        radius: 12,
-        fill: new Fill({ color: "red" }),
+        radius: 10,
+        fill: new Fill({ color: "rgba(220, 53, 69, 0.95)" }),
         stroke: new Stroke({ color: "white", width: 3 }),
       }),
     }),
-    zIndex: 999,
+    zIndex: 100,
   });
 }
