@@ -68,7 +68,14 @@ export function MapView() {
     // Når brukeren klikker på kartet, finn nærmeste skole
     map.on("click", async (event) => {
       try {
+        if (popupRef.current) {
+          popupRef.current.style.display = "none";
+        }
         const [lon, lat] = event.coordinate as [number, number];
+        map.getView().animate({
+          center: [lon, lat],
+          duration: 500,
+        });
         const data = await fetchNearestSchool(lon, lat);
 
         if (nearestLayer) {
@@ -85,7 +92,7 @@ export function MapView() {
           const avstand = Math.round(feature.properties.avstand);
 
           popupRef.current.innerHTML = `
-            <div>
+            <div style="font-size: 14px line-height: 1.4">
               <strong>${skolenavn}</strong><br />
               Avstand: ${avstand} meter
             </div>
